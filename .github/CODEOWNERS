@@ -1,0 +1,14 @@
+# Lider de Projeto
+* @samurrocha
+
+# Restringe a pasta do frontend para a equipe frontend
+/apps/web/ @samurrocha @fabrica-bayarea/chat-2026-2-frontend
+
+# Restringe a pasta do backend para a equipe backend
+/apps/backend/ @samurrocha @fabrica-bayarea/chat-2026-2-backend
+
+# Restringe o core de IA para a equipe backend
+/apps/mastra-core/ @samurrocha @fabrica-bayarea/chat-2026-2-backend
+
+# Restringe o servidor MCP para a equipe backend
+/apps/mcp-server/ @samurrocha @fabrica-bayarea/chat-2026-2-backend

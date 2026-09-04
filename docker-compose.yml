@@ -1,0 +1,75 @@
+version: '3.8'
+
+services:
+  # ==========================================
+  # 1. Interface Web (Frontend React / Vite via Nginx)
+  # ==========================================
+  web:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+    container_name: iesb-chat-web
+    ports:
+      - "5173:80"
+    environment:
+      - VITE_API_URL=http://localhost:3000
+    depends_on:
+      - backend
+    networks:
+      - iesb-net
+
+  # ==========================================
+  # 2. Backend Principal (NestJS)
+  # ==========================================
+  backend:
+    build:
+      context: .
+      dockerfile: apps/backend/Dockerfile
+    container_name: iesb-chat-backend
+    ports:
+      - "3000:3000"
+    environment:
+      - PORT=3000
+      - NODE_ENV=development
+    volumes:
+      - ./apps/backend:/app/apps/backend # Permite hot-reload/sincronização opcional
+    networks:
+      - iesb-net
+
+  # ==========================================
+  # 3. Cérebro de IA (Mastra Core)
+  # ==========================================
+  mastra-core:
+    build:
+      context: .
+      dockerfile: apps/mastra-core/Dockerfile
+    container_name: iesb-chat-mastra
+    ports:
+      - "4111:4111"
+    environment:
+      - PORT=4111
+      - NODE_ENV=development
+      # Facilita a comunicação caso a LLM esteja rodando direto na sua máquina física (ex: Ollama)
+      - LOCAL_LLM_BASE_URL=http://host.docker.internal:11434/v1
+    networks:
+      - iesb-net
+
+  # ==========================================
+  # 4. Servidor MCP Customizado (CRUD / Legados)
+  # ==========================================
+  mcp-server:
+    build:
+      context: .
+      dockerfile: apps/mcp-server/Dockerfile
+    container_name: iesb-chat-mcp
+    ports:
+      - "4000:4000"
+    environment:
+      - PORT=4000
+      - NODE_ENV=development
+    networks:
+      - iesb-net
+
+networks:
+  iesb-net:
+    driver: bridge

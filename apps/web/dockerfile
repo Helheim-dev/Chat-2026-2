@@ -1,0 +1,22 @@
+# ==========================================
+# 1. Estágio de Build da Interface Web
+# ==========================================
+FROM node:24-alpine AS builder
+RUN corepack enable && corepack prepare pnpm@latest --activate
+WORKDIR /app
+
+COPY pnpm-lock.yaml pnpm-workspace.yaml package.json turbo.json ./
+COPY apps/web ./apps/web
+
+RUN pnpm install --frozen-lockfile
+RUN pnpm --filter web build
+
+# ==========================================
+# 2. Estágio de Servidor Web Leve (Nginx)
+# ==========================================
+FROM nginx:alpine AS runner
+# Copia os arquivos estáticos gerados pelo Vite para o Nginx
+COPY --from=builder /app/apps/web/dist /usr/share/nginx/html
+
+EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]
